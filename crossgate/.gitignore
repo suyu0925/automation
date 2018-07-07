@@ -1,6 +1,6 @@
 # screenshot
-game.png
-game_cv2.png
+*.png
+!assets/*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
