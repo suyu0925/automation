@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from PIL import ImageGrab
 from config import *
+import pytesseract
 
 assets = {
     "accept_task": cv2.imread("./assets/accept_task.png"),
@@ -124,6 +125,12 @@ def act(action):
   click(x, y)
 
 
+def isAcceptTask(img):
+  string = pytesseract.image_to_string(img, lang='chi_sim')
+  print('ocr accept_task', string)
+  return string == '接受委托'
+
+
 if __name__ == '__main__':
   # 1、定位游戏窗体
   game_rect = getGameWindowRect()
@@ -140,7 +147,7 @@ if __name__ == '__main__':
     battle_action = cropBattleAction(game_image, save=True)
     accept_task = cropAcceptTask(game_image, save=True)
 
-    if nearlyEqual(accept_task, assets["accept_task"]):
+    if isAcceptTask(accept_task):
       print('提示框：接受委托')
       act("accept_task")
       act("second_task")
