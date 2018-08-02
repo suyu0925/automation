@@ -14,17 +14,17 @@ assets = {
     "battle_action": cv2.imread("./assets/battle_action.png")
 }
 
+window_title = None
+
 # 获取窗体坐标位置(左上)
 
 
 def getGameWindowRect():
   # FindWindow(lpClassName=None, lpWindowName=None)  窗口类名 窗口标题名
-  window = win32gui.FindWindow(None, WINDOW_TITLE)
-  # 没有定位到游戏窗体
-  while not window:
-    print('定位游戏窗体失败，5秒后重试...')
-    time.sleep(5)
-    window = win32gui.FindWindow(None, WINDOW_TITLE)
+  window = win32gui.FindWindow(None, window_title)
+  if not window:
+    return None
+
   # 定位到游戏窗体
   win32gui.SetForegroundWindow(window)  # 将窗体顶置
   rect = win32gui.GetWindowRect(window)
@@ -84,7 +84,7 @@ def nearlyEqual(a, b):
 
 def isForeground():
   text = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-  return text == WINDOW_TITLE
+  return text == window_title
 
 
 def click(x, y):
@@ -130,36 +130,41 @@ def isAcceptTask(img):
   print('ocr accept_task', string)
   return string == '接受委托'
 
+window_title = None
+window_titles = [WINDOW_TITLE, WINDOW_TITLE_2]
 
 if __name__ == '__main__':
-  # 1、定位游戏窗体
-  game_rect = getGameWindowRect()
-  time.sleep(1)
-
   frame = 0
   while MAX_FRAME != 0:
     frame += 1
 
-    # 从屏幕截图一张，通过opencv读取
-    game_image = getGameImage(game_rect, save=True)
+    for window_title in window_titles:
+      # 1、定位游戏窗体
+      game_rect = getGameWindowRect()
+      time.sleep(1)
+      if game_rect == None:
+        continue
 
-    second_task = cropSecondTask(game_image, save=True)
-    battle_action = cropBattleAction(game_image, save=True)
-    accept_task = cropAcceptTask(game_image, save=True)
+      # 从屏幕截图一张，通过opencv读取
+      game_image = getGameImage(game_rect, save=True)
 
-    if isAcceptTask(accept_task):
-      print('提示框：接受委托')
-      act("accept_task")
-      act("second_task")
-      act("second_task")
-    elif nearlyEqual(battle_action, assets["battle_action"]):
-      print('自动战斗中')
-    else:
-      print('默认寻路第二个任务')
-      act("second_task")
+      second_task = cropSecondTask(game_image, save=True)
+      battle_action = cropBattleAction(game_image, save=True)
+      accept_task = cropAcceptTask(game_image, save=True)
 
-    time.sleep(3)
-    print('{}: 完成第{}次运行'.format(datetime.datetime.now(), frame))
+      if isAcceptTask(accept_task):
+        print('提示框：接受委托')
+        act("accept_task")
+        act("second_task")
+        act("second_task")
+      elif nearlyEqual(battle_action, assets["battle_action"]):
+        print('自动战斗中')
+      else:
+        print('默认寻路第二个任务')
+        act("second_task")
+
+      time.sleep(3)
+      print('{}: 完成第{}次运行'.format(datetime.datetime.now(), frame))
 
     if MAX_FRAME > 0 and frame >= MAX_FRAME:
       break

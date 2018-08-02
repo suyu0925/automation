@@ -6,6 +6,7 @@ STOP_WHEN_BACKGROUND = False
 
 # 窗体标题  用于定位游戏窗体
 WINDOW_TITLE = "腾讯手游助手【极速傲引擎】"
+WINDOW_TITLE_2 = "腾讯手游助手【极速傲引擎-多开模式】"
 # 游戏区域距离顶点的长度
 MARGIN_LEFT = 0
 # 游戏区域距离顶点的高度
